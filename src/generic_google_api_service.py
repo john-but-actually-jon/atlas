@@ -19,8 +19,8 @@ def create_service(
 
     cred = None
     working_dir = os.getcwd()
-    token_dir = "token_files"
-    pickle_file = f"token_{api_name}_{api_version}{prefix}.pickle"
+    token_dir = ".token_files"
+    pickle_file = f".token_{api_name}_{api_version}{prefix}.pickle"
 
     # Check if token dir exists first, if not, create the folder
     if not os.path.exists(os.path.join(working_dir, token_dir)):
