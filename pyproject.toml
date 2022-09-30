@@ -1,0 +1,2 @@
+[tool.flake8]
+default-line-length=88
