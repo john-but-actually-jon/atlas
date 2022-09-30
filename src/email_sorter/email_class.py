@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 import base64
 
-from exceptions import InvalidSenderAddress
+from src.exceptions import InvalidSenderAddress
 
 
 @dataclass
@@ -86,7 +86,7 @@ class EmailParser:
         return Email(
             date=parsed_headers["Date"],
             receiver=parsed_headers["To"].strip("<>"),
-            sender=parsed_headers["From"].split(" ")[1].strip("<>"),
+            sender=parsed_headers["From"].split(" ")[-1].strip("<>"),
             subject=self.raw_email["snippet"],
             body=body,
         )
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         _email = (
             gmail.users()
             .messages()
-            .get(userId="me", id="18388d78eeafd544", metadataHeaders="full")
+            .get(userId="me", id="1838aae504781838", metadataHeaders="full")
             .execute()
         )
 

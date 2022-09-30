@@ -2,7 +2,7 @@ import pickle
 import os
 from typing import List, Optional, Dict
 
-from .config import logger
+from src.config import logger
 
 
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -19,7 +19,7 @@ def create_service(
 
     cred = None
     working_dir = os.getcwd()
-    token_dir = ".token_files"
+    token_dir = ".token_pickles"
     pickle_file = f".token_{api_name}_{api_version}{prefix}.pickle"
 
     # Check if token dir exists first, if not, create the folder
