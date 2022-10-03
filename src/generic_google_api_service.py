@@ -19,17 +19,21 @@ def create_service(
     the resulting service object.
 
     Parameters:
-        - `client_secret_file` (required): Path to the credentials file, defined in .env file. Download from your google project dashboard.
-        - `api_name` (required): Name of the desired google service, e.g.
-        "gmail"
-        - `api_version` (required): Version of the API to use, format "v1".
-        - `scopes` (required): Scopes required for each service, typically
-        defined in .env file.
-        - `pickle_prefix` (optional): The prefix for the authorization
-        pickle files
+        - `client_secret_file` (required): Path to the
+        credentials file, defined in .env file.
+        Download from your google project dashboard.
+        - `api_name` (required): Name of the desired
+        google service, e.g. "gmail"
+        - `api_version` (required): Version of the API to use,
+        format "v1".
+        - `scopes` (required): Scopes required for each service,
+        typically defined in .env file.
+        - `pickle_prefix` (optional): The prefix for the
+        authorization pickle files
 
     Returns:
-    - Google API service, when service creation fails, none is returned.
+    - Google API service, when service creation fails,
+    none is returned.
     """
 
     client_secret_file = client_secret_file
@@ -78,7 +82,8 @@ class google_api_service:
     terminate services when no longer needed
 
     Parameters:
-        - `client_secret_file` (required): Path to the credentials file, defined in .env file. Download from your google project dashboard.
+        - `client_secret_file` (required): Path to the credentials file,
+        defined in .env file. Download from your google project dashboard.
         - `api_name` (required): Name of the desired google service, e.g.
         "gmail"
         - `api_version` (required): Version of the API to use, format "v1".
