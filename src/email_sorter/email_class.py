@@ -12,13 +12,13 @@ class Email:
     """
     Generic email class, for storing relevant email data
 
-    Input Parameters:
-    date: Date the email was received
-    sender: Address the message was received from
-    subect: Email subject line
-    body: The decoded body of the email,
+    Parameters:
+        - `date`: Date the email was received
+        - `sender`: Address the message was received from
+        - `subect`: Email subject line
+        - `body`: The decoded body of the email,
         not including attachments and non-text MIME types
-    attachments: Descriptions of the attachments to the email #TODO
+        - `attachments`: Descriptions of the attachments to the email #TODO
 
     """
 
@@ -55,6 +55,17 @@ class Email:
 
 @dataclass
 class EmailParser:
+    """
+    Class for converting raw email dictionary objects returned directly by the Google API service calls.
+
+    Parameters:
+        - `raw_email` (required): The raw email dictionary object to parse
+        into an `Email` instance.
+        - `desired_head_keys` (optional): List of headers that should be parsed.
+        - `valid_body_mime_types` (optional): List of email part types to
+        filter for relevant information
+    """
+
     raw_email: Dict[str, Any]
     desired_header_keys: List[str] = field(
         default_factory=lambda: ["From", "To", "Date"]

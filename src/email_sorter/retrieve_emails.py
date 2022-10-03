@@ -15,20 +15,32 @@ class EmailRetriever:
     """
     Class that retrieves the desired number of emails using an existing
     google api gmail client.
-    Use the context manager defined generic_google_api_service.py,
-    and perform any operations using this class strictly inside said context.
-    Once the emails have been fetched, you can leave the context manager.
+
+    Parameters:
+        - `gmail_service` (required): context manager defined
+        generic_google_api_service.py. Any operations performed
+        by this class should be performed strictly inside the gmail context
+        - `number_of_emails` (optional): The number of emails to fetch
+        using `fetch_email_ids`, default 10
+        - `return_format` (optional): The desired format of the emails to
+        be collected. One of ["full", "metadata", "minimal", "raw"].
+        Default: "full"
+        - `metadata_headers`: Usage unclear xd. Default: "full"
     """
 
     gmail_service: Resource
     number_of_emails: int = 10
     return_format: Literal["full", "metadata", "minimal", "raw"] = "full"
-    metadataHeaders: Literal["full"] = "full"
+    metadata_headers: Literal["full"] = "full"
 
     def fetch_email_ids(self) -> List[Dict[str, str]]:
         """
         Returns a list of dictionaries with both message IDs and
         thread IDs for the top results for the latest number_of_emails
+
+        Returns:
+            - List of latest `self.number_of_emails` dictionaries with
+            both message and thread IDs
         """
         email_ids: List[Dict[str, str]] = []
         page_token = None
@@ -47,7 +59,18 @@ class EmailRetriever:
     def fetch_emails(
         self, email_ids: Optional[List[str]] = None
     ) -> List[Dict[str, Any]]:
-        """"""
+        """
+        Returns a list of raw email objects
+
+        Parameters:
+            - `email_ids` (optional): A list of the desired email IDs.
+            If not supplied, the latest `number_of_emails` (defined
+            at instance definition) is returned.
+
+        Returns:
+            - A list of raw email dictionaries, fetched directly
+            from google gmail api
+        """
         emails = []
         if email_ids:
             ids = [{"id": id} for id in email_ids]
