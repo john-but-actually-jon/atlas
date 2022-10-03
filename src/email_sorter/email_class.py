@@ -56,7 +56,8 @@ class Email:
 @dataclass
 class EmailParser:
     """
-    Class for converting raw email dictionary objects returned directly by the Google API service calls.
+    Class for converting raw email dictionary objects returned directly
+    by the Google API service calls.
 
     Parameters:
         - `raw_email` (required): The raw email dictionary object to parse
@@ -89,11 +90,19 @@ class EmailParser:
             for header in self.raw_email["payload"]["headers"]
             if header["name"] in self.desired_header_keys
         }
-        body = {
-            part["mimeType"]: self.urlsafe_b64decoder(part["body"]["data"])
-            for part in self.raw_email["payload"]["parts"]
-            if part["mimeType"] in self.valid_body_mime_types
-        }
+        try:
+            body = {
+                part["mimeType"]: self.urlsafe_b64decoder(part["body"]["data"])
+                for part in self.raw_email["payload"]["parts"]
+                if part["mimeType"] in self.valid_body_mime_types
+            }
+        except KeyError:
+            # Handle emails with only one part
+            body = {
+                self.raw_email["payload"]["mimeType"]: self.urlsafe_b64decoder(
+                    self.raw_email["payload"]["body"]
+                )
+            }
         return Email(
             date=parsed_headers["Date"],
             receiver=parsed_headers["To"].strip("<>"),

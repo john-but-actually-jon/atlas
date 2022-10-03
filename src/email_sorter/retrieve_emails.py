@@ -85,7 +85,7 @@ class EmailRetriever:
                     userId="me",
                     id=full_id["id"],
                     format=self.return_format,
-                    metadataHeaders=self.metadataHeaders,
+                    metadataHeaders=self.metadata_headers,
                 )
                 .execute()
             )

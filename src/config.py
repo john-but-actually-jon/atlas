@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from logging import getLogger, INFO
 
-from .exceptions import InvalidConfigException
+from exceptions import InvalidConfigException
 
 logger = getLogger()
 logger.setLevel(INFO)
