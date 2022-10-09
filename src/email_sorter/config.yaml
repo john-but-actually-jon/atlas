@@ -1,0 +1,7 @@
+email_ranking:
+  # Keyword extraction model params
+  keybert_params:
+    top_n: 10
+    n_gram_bottom: 0
+    n_gram_top: 1
+    highlight: False
