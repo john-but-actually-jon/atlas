@@ -3,6 +3,7 @@ from typing import Optional, Union, Dict, Any, List
 from datetime import datetime
 import re
 import base64
+from bs4 import BeautifulSoup
 
 from src.exceptions import InvalidSenderAddress
 
@@ -83,6 +84,50 @@ class EmailParser:
     def attachments_handler(self):
         raise NotImplementedError
 
+    @staticmethod
+    def html_body_parser(body: str) -> str:
+        """
+        A parser for HTML bodies which returns a plaintext string
+        containing just the text from the body.
+
+        Parameters:
+            - `body` (required): the HTML body to parse into plaintext
+
+        Returns:
+            Returns: The plaintext content of the passed body. Excluding
+            scripts and other HTML features
+        """
+        _body = BeautifulSoup(body, features="html.parser")
+
+        # Remove script elements
+        for script in _body(["script", "style"]):
+            script.extract()
+
+        text = _body.body.get_text()
+
+        # break into lines and remove leading and trailing space on each
+        lines = (line.strip() for line in text.splitlines())
+        # break multi-headlines into a line each
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        # drop blank lines
+        text = "\n".join(chunk for chunk in chunks if chunk)
+
+        return text
+
+    def body_handler(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        body = {}
+        try:
+            for part in payload["parts"]:
+                # if part['mimeType'] in self.valid_body_mime_types:
+                body.update(
+                    {part["mimeType"]: self.urlsafe_b64decoder(part["body"]["data"])}
+                )
+        except KeyError:
+            body.update(
+                {payload["mimeType"]: self.urlsafe_b64decoder(payload["body"]["data"])}
+            )
+        return body
+
     def parse(self) -> Email:
         """Return an Email object from a raw email output from the Gmail API"""
         parsed_headers = {
@@ -90,22 +135,14 @@ class EmailParser:
             for header in self.raw_email["payload"]["headers"]
             if header["name"] in self.desired_header_keys
         }
-        try:
-            body = {
-                part["mimeType"]: self.urlsafe_b64decoder(part["body"]["data"])
-                for part in self.raw_email["payload"]["parts"]
-                if part["mimeType"] in self.valid_body_mime_types
-            }
-        except KeyError:
-            # Handle emails with only one part
-            body = {
-                self.raw_email["payload"]["mimeType"]: self.urlsafe_b64decoder(
-                    self.raw_email["payload"]["body"]
-                )
-            }
+        body = self.body_handler(self.raw_email["payload"])
+        for mime_type, part in body.items():
+            if "html" in mime_type:
+                body[mime_type] = self.html_body_parser(part)
+
         return Email(
             date=parsed_headers["Date"],
-            receiver=parsed_headers["To"].strip("<>"),
+            receiver=parsed_headers["To"].split(" ")[-1].strip("<>"),
             sender=parsed_headers["From"].split(" ")[-1].strip("<>"),
             subject=self.raw_email["snippet"],
             body=body,
