@@ -11,7 +11,7 @@ from google.auth.transport.requests import Request
 
 
 def create_service(
-    client_secret_file, api_name, api_version, scopes: Dict[str, List[str]], prefix=""
+    client_secret_file, api_name, api_version, scopes: Dict[str, List[str]], suffix=""
 ) -> Optional[Resource]:
     """
     Function for creating a Google API service. The service context manager
@@ -28,7 +28,7 @@ def create_service(
         format "v1".
         - `scopes` (required): Scopes required for each service,
         typically defined in .env file.
-        - `pickle_prefix` (optional): The prefix for the
+        - `suffix` (optional): The suffix for the
         authorization pickle files
 
     Returns:
@@ -43,7 +43,7 @@ def create_service(
     cred = None
     working_dir = os.getcwd()
     token_dir = ".token_pickles"
-    pickle_file = f".token_{api_name}_{api_version}{prefix}.pickle"
+    pickle_file = f".token_{api_name}_{api_version}-{suffix}.pickle"
 
     # Check if token dir exists first, if not, create the folder
     if not os.path.exists(os.path.join(working_dir, token_dir)):
@@ -99,11 +99,11 @@ class google_api_service:
         api_name: str,
         api_version: str,
         scopes: Dict[str, List[str]],
-        pickle_prefix: str = "",
+        pickle_suffix: str = "",
     ) -> None:
         try:
             self.service = create_service(
-                client_secret_file, api_name, api_version, scopes, prefix=pickle_prefix
+                client_secret_file, api_name, api_version, scopes, suffix=pickle_suffix
             )
             assert self.service
         except Exception as e:
@@ -118,4 +118,7 @@ class google_api_service:
 
 
 if __name__ == "__main__":
-    pass
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    creds_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
